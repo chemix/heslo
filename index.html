@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Password Generator</title>
   <meta name="robots" content="noindex, nofollow">
-  <link rel="stylesheet" href="/kostra.css?v=11">
-  <link rel="stylesheet" href="/styles.css?v=11">
-  <script defer src="/app.js?v=11"></script>
+  <link rel="stylesheet" href="/kostra.css?v=12">
+  <link rel="stylesheet" href="/styles.css?v=12">
+  <script defer src="/app.js?v=12"></script>
 </head>
 <body>
   <main class="page-shell">
@@ -26,7 +26,7 @@
       </div>
 
       <div class="controls-row">
-        <div class="mode-switch" role="group" aria-label="Režim">
+        <div class="segmented" role="group" aria-label="Režim">
           <label><input type="radio" name="mode" value="random" checked> Random</label>
           <label><input type="radio" name="mode" value="memorable"> Memorable</label>
         </div>
@@ -72,7 +72,7 @@
         <h2>Hesla</h2>
         <button class="btn btn--outline" id="copyTableBtn" type="button">Kopírovat tabulku</button>
       </div>
-      <table class="pw-table">
+      <table class="table pw-table">
         <thead>
           <tr><th class="col-num">#</th><th class="col-user">Username</th><th>Password</th><th class="col-action"><span class="sr-only">Akce</span></th></tr>
         </thead>

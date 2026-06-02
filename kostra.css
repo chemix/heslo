@@ -316,6 +316,43 @@ code {
   border-radius: var(--radius-md);
 }
 
+/* === Form field (.field) — stacked label + control =============== */
+.field {
+  display: grid;
+  gap: 0.45rem;
+}
+.field > span {
+  color: var(--muted);
+}
+
+/* Tlumený nápovědný / stavový text pod polem. */
+.hint {
+  color: var(--muted);
+  min-height: 1.2em;
+}
+
+/* === Segmented control (.segmented) — radio skupina jako tlačítka = */
+.segmented {
+  display: flex;
+  gap: 0.6rem;
+}
+.segmented > label {
+  align-items: center;
+  background: var(--panel-soft);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  flex: 1;
+  gap: 0.5rem;
+  justify-content: center;
+  padding: 0.55rem 0.65rem;
+}
+.segmented > label:has(input:checked) {
+  border-color: var(--accent);
+  box-shadow: var(--ring-accent);
+}
+
 /* === Card (.card) ================================================= */
 .card {
   background: var(--panel);
@@ -330,6 +367,28 @@ code {
 .card > h2,
 .card > h3 {
   margin-top: 0;
+}
+
+/* === Table (.table) ============================================== */
+.table {
+  border: 1px solid var(--line);
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  width: 100%;
+}
+.table th,
+.table td {
+  border: 1px solid var(--line-soft);
+  text-align: left;
+}
+.table th {
+  background: var(--panel-2);
+  color: var(--text);
+  font-weight: 600;
+  padding: 0.45rem 0.7rem;
+}
+.table td {
+  padding: 0.5rem 0.7rem;
 }
 
 /* === Dropdown menu (details/summary) ============================== */
@@ -494,4 +553,19 @@ code {
   background: color-mix(in srgb, var(--success) 12%, transparent);
   border-color: transparent;
   color: var(--success);
+}
+
+/* === Utilities =================================================== */
+
+/* Vizuálně skryté, ale čitelné pro screenreadery. */
+.sr-only {
+  border: 0;
+  clip: rect(0, 0, 0, 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
 }
