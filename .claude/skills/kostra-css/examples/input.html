@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="cs">
+  <head>
+    <meta charset="utf-8" />
+    <title>kostra — inputs</title>
+    <link rel="stylesheet" href="../kostra.css" />
+    <style>
+      body { padding: 2rem; max-width: 32rem; }
+      .field { display: grid; gap: 0.35rem; margin-bottom: 1rem; }
+      .field label { color: var(--muted); font-size: 0.84rem; }
+    </style>
+  </head>
+  <body>
+    <h1>Inputs</h1>
+
+    <div class="field">
+      <label for="small">Small</label>
+      <input id="small" class="input input--sm" placeholder="Small input" />
+    </div>
+
+    <div class="field">
+      <label for="default">Default</label>
+      <input id="default" class="input" placeholder="Default input" />
+    </div>
+
+    <div class="field">
+      <label for="large">Large</label>
+      <input id="large" class="input input--lg" placeholder="Large input" />
+    </div>
+
+    <div class="field">
+      <label for="disabled">Disabled</label>
+      <input id="disabled" class="input" placeholder="Disabled" disabled />
+    </div>
+
+    <div class="field">
+      <label for="token">With submit</label>
+      <input id="token" class="input input--lg" type="password" placeholder="TOKEN" />
+      <button class="btn btn--default" style="margin-top: 0.4rem">Connect</button>
+    </div>
+  </body>
+</html>
