@@ -41,7 +41,7 @@ How it works now
 
 - **Terse subject** — `git log --oneline` stays scannable. If the subject can't fit, the commit is probably two commits.
 - **Why before what** — diffs already show *what*. Reviewers and future-you need the *why* that the diff cannot recover.
-- **How it works now** — replaces the "current architecture" prose we used to dump into `ACTIVITY_LOG.md`. Reading the last N commits should reconstruct the system without opening source.
+- **How it works now** — captures the current architecture. Reading the last N commits should reconstruct the system without opening source.
 - **No "Co-Authored-By: Claude" unless requested** — keeps history clean; the user can add it explicitly when they want it.
 
 ## Subject line patterns

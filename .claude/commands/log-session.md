@@ -4,7 +4,7 @@ description: Wrap up the current session by committing the work with a properly-
 
 # /log-session
 
-End-of-session commit flow. Used to replace the old `ACTIVITY_LOG.md` append: instead of a markdown entry, the session's substantive changes become one (or more) git commits whose bodies carry the same information.
+End-of-session commit flow. The session's substantive changes become one (or more) git commits whose bodies carry the why/what/how-it-works-now of the work — git history *is* the activity log.
 
 ## When to run
 
