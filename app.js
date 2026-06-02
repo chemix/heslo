@@ -15,6 +15,8 @@
     'silver', 'spruce', 'summit', 'thunder', 'tiger', 'velvet', 'violet', 'walnut'
   ];
 
+  const NO_SET_MSG = 'Vyber aspoň jednu znakovou sadu.';
+
   function randomInt(maxExclusive) {
     const limit = Math.floor(0x100000000 / maxExclusive) * maxExclusive;
     const values = new Uint32Array(1);
@@ -88,7 +90,7 @@
       copyHint.textContent = '';
       const pw = generateOne();
       if (pw === null) {
-        copyHint.textContent = 'Vyber aspoň jednu znakovou sadu.';
+        copyHint.textContent = NO_SET_MSG;
         return;
       }
       result.value = pw;
@@ -139,55 +141,95 @@
     document.addEventListener('click', () => toggleMenu(false));
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') toggleMenu(false); });
 
-    // --- Bulk: 10 passwords into a table ---
+    // --- Bulk: passwords into a table ---
+    const generatorCard = document.getElementById('generatorCard');
     const tableCard = document.getElementById('tableCard');
     const tableBody = document.getElementById('tableBody');
     const tableHint = document.getElementById('tableHint');
     const bulkBtn = document.getElementById('bulkBtn');
+    const addRowBtn = document.getElementById('addRowBtn');
     const copyTableBtn = document.getElementById('copyTableBtn');
+
+    // Roll a password; on failure (no charset selected) show the table hint
+    // and return null so the caller can bail.
+    const nextPasswordOrWarn = () => {
+      tableHint.textContent = '';
+      const pw = generateOne();
+      if (pw === null) tableHint.textContent = NO_SET_MSG;
+      return pw;
+    };
+
+    const REGEN_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>';
+
+    // Build one table row; the regenerate button re-rolls just this cell.
+    const makeRow = (index, pw) => {
+      const tr = document.createElement('tr');
+
+      const num = document.createElement('td');
+      num.className = 'col-num';
+      num.textContent = String(index);
+
+      const userCell = document.createElement('td');
+      const userInput = document.createElement('input');
+      userInput.className = 'input username-input';
+      userInput.type = 'text';
+      userInput.placeholder = 'username';
+      userInput.autocomplete = 'off';
+      userInput.spellcheck = false;
+      userCell.appendChild(userInput);
+
+      const pwCell = document.createElement('td');
+      pwCell.className = 'pw-cell';
+      pwCell.textContent = pw;
+
+      const actionCell = document.createElement('td');
+      actionCell.className = 'col-action';
+      const regenBtn = document.createElement('button');
+      regenBtn.type = 'button';
+      regenBtn.className = 'btn btn--outline regen-btn';
+      // Skip the regenerate button in Tab order so focus walks the username
+      // inputs one after another; it stays clickable.
+      regenBtn.tabIndex = -1;
+      regenBtn.title = 'Přegenerovat heslo';
+      regenBtn.setAttribute('aria-label', 'Přegenerovat heslo');
+      regenBtn.innerHTML = REGEN_ICON;
+      regenBtn.addEventListener('click', () => {
+        const next = nextPasswordOrWarn();
+        if (next !== null) pwCell.textContent = next;
+      });
+      actionCell.appendChild(regenBtn);
+
+      tr.append(num, userCell, pwCell, actionCell);
+      return tr;
+    };
 
     const generateTable = () => {
       const rows = [];
       for (let i = 0; i < 10; i += 1) {
-        const pw = generateOne();
-        if (pw === null) {
-          tableHint.textContent = 'Vyber aspoň jednu znakovou sadu.';
-          return false;
-        }
+        const pw = nextPasswordOrWarn();
+        if (pw === null) return false;
         rows.push(pw);
       }
       tableBody.innerHTML = '';
-      rows.forEach((pw, i) => {
-        const tr = document.createElement('tr');
-
-        const num = document.createElement('td');
-        num.className = 'col-num';
-        num.textContent = String(i + 1);
-
-        const userCell = document.createElement('td');
-        const userInput = document.createElement('input');
-        userInput.className = 'input username-input';
-        userInput.type = 'text';
-        userInput.placeholder = 'username';
-        userInput.autocomplete = 'off';
-        userInput.spellcheck = false;
-        userCell.appendChild(userInput);
-
-        const pwCell = document.createElement('td');
-        pwCell.className = 'pw-cell';
-        pwCell.textContent = pw;
-
-        tr.append(num, userCell, pwCell);
-        tableBody.appendChild(tr);
-      });
-      tableHint.textContent = '';
+      rows.forEach((pw, i) => tableBody.appendChild(makeRow(i + 1, pw)));
       return true;
+    };
+
+    const addRow = () => {
+      const pw = nextPasswordOrWarn();
+      if (pw === null) return;
+      tableBody.appendChild(makeRow(tableBody.children.length + 1, pw));
     };
 
     bulkBtn.addEventListener('click', () => {
       toggleMenu(false);
-      if (generateTable()) tableCard.hidden = false;
+      if (generateTable()) {
+        tableCard.hidden = false;
+        generatorCard.hidden = true;
+      }
     });
+
+    addRowBtn.addEventListener('click', addRow);
 
     // Build an ASCII table from the current usernames + passwords
     const asciiTable = () => {

@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Password Generator</title>
   <meta name="robots" content="noindex, nofollow">
-  <link rel="stylesheet" href="/kostra.css?v=8">
-  <link rel="stylesheet" href="/styles.css?v=8">
-  <script defer src="/app.js?v=8"></script>
+  <link rel="stylesheet" href="/kostra.css?v=9">
+  <link rel="stylesheet" href="/styles.css?v=9">
+  <script defer src="/app.js?v=9"></script>
 </head>
 <body>
   <main class="page-shell">
-    <section class="card">
+    <section class="card" id="generatorCard">
       <h1>Password Generator</h1>
 
       <div class="result-row">
@@ -69,15 +69,16 @@
 
     <section class="card table-card" id="tableCard" hidden>
       <div class="table-head">
-        <h2>10 hesel</h2>
+        <h2>Hesla</h2>
         <button class="btn btn--outline" id="copyTableBtn" type="button">Kopírovat tabulku</button>
       </div>
       <table class="pw-table">
         <thead>
-          <tr><th class="col-num">#</th><th class="col-user">Username</th><th>Password</th></tr>
+          <tr><th class="col-num">#</th><th class="col-user">Username</th><th>Password</th><th class="col-action"><span class="sr-only">Akce</span></th></tr>
         </thead>
         <tbody id="tableBody"></tbody>
       </table>
+      <button class="btn btn--outline add-row-btn" id="addRowBtn" type="button">+ Přidat řádek</button>
       <span class="hint" id="tableHint" aria-live="polite"></span>
     </section>
   </main>

@@ -19,6 +19,10 @@ body {
   gap: 1rem;
 }
 
+.card[hidden] {
+  display: none;
+}
+
 .card h1 {
   margin: 0;
   font-size: clamp(1.6rem, 4vw, 2.4rem);
@@ -208,10 +212,6 @@ body {
   margin-top: 1rem;
 }
 
-.table-card[hidden] {
-  display: none;
-}
-
 .table-head {
   display: flex;
   align-items: center;
@@ -258,6 +258,29 @@ body {
 
 .col-user {
   width: 34%;
+}
+
+.pw-table .col-action {
+  width: 3.25rem;
+  text-align: center;
+}
+
+.pw-table td.col-action {
+  padding: 0.3rem;
+}
+
+/* Per-row regenerate: compact square icon button */
+.regen-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+}
+
+.add-row-btn {
+  align-self: flex-start;
 }
 
 .pw-cell {
