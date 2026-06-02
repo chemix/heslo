@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Micro Password Generator</title>
+  <meta name="description" content="Statický klientský generátor hesel a passphrase bez ukládání a backendu.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="/kostra.css">
+  <link rel="stylesheet" href="/styles.css">
+  <script defer src="/app.js"></script>
+</head>
+<body>
+  <main class="page-shell">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">client-side · bez storage · bez backendu</p>
+        <h1>Micro Password Generator</h1>
+        <p class="lede">Rychlé náhodné heslo nebo krátká passphrase. Generování běží jen v prohlížeči přes <code>crypto.getRandomValues</code>.</p>
+      </div>
+      <span class="status" id="cryptoStatus"><span class="dot dot--connecting"></span> kontroluji crypto…</span>
+    </section>
+
+    <section class="card generator-card" aria-labelledby="generatorTitle">
+      <div class="card-head">
+        <div>
+          <h2 id="generatorTitle">Generator</h2>
+          <p>Nastav pravidla, zmáčkni Generate a zkopíruj výsledek.</p>
+        </div>
+        <span class="badge badge--accent" id="modeBadge">Password</span>
+      </div>
+
+      <div class="result-row">
+        <label class="sr-only" for="result">Vygenerovaná hodnota</label>
+        <input class="input input--lg result-input" id="result" type="text" readonly spellcheck="false" autocomplete="off" value="">
+        <button class="btn btn--outline" id="copyBtn" type="button">Copy</button>
+      </div>
+
+      <div class="actions-row">
+        <button class="btn btn--default btn--lg" id="generateBtn" type="button">Generate</button>
+        <span class="hint" id="copyHint" aria-live="polite">Nic se nikam neposílá ani neukládá.</span>
+      </div>
+
+      <div class="meter" aria-label="Strength hint">
+        <div class="meter__bar"><span id="meterFill"></span></div>
+        <div class="meter__text">
+          <strong id="strengthLabel">—</strong>
+          <span id="entropyHint">Vyber nastavení a generuj.</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="layout-grid">
+      <form class="card" id="settingsForm" autocomplete="off">
+        <h2>Nastavení hesla</h2>
+
+        <div class="mode-switch" role="group" aria-label="Režim generování">
+          <label class="choice-card">
+            <input type="radio" name="mode" value="password" checked>
+            <span>Password</span>
+            <small>znaky podle sad</small>
+          </label>
+          <label class="choice-card">
+            <input type="radio" name="mode" value="passphrase">
+            <span>Passphrase</span>
+            <small>lokální wordlist</small>
+          </label>
+        </div>
+
+        <div class="password-options" id="passwordOptions">
+          <label class="field">
+            <span>Délka: <strong id="lengthValue">20</strong></span>
+            <input id="length" type="range" min="8" max="64" value="20">
+          </label>
+
+          <div class="toggles" aria-label="Znakové sady">
+            <label><input id="lowercase" type="checkbox" checked> lowercase <kbd class="kbd">a-z</kbd></label>
+            <label><input id="uppercase" type="checkbox" checked> uppercase <kbd class="kbd">A-Z</kbd></label>
+            <label><input id="numbers" type="checkbox" checked> numbers <kbd class="kbd">0-9</kbd></label>
+            <label><input id="symbols" type="checkbox" checked> symbols <kbd class="kbd">!@#</kbd></label>
+          </div>
+        </div>
+
+        <div class="passphrase-options" id="passphraseOptions" hidden>
+          <label class="field">
+            <span>Počet slov: <strong id="wordCountValue">6</strong></span>
+            <input id="wordCount" type="range" min="3" max="8" value="6">
+          </label>
+          <label class="field">
+            <span>Oddělovač</span>
+            <input class="input" id="separator" type="text" maxlength="3" value="-" aria-label="Oddělovač slov">
+          </label>
+          <label class="inline-check"><input id="capitalize" type="checkbox"> Capitalize slova</label>
+          <label class="inline-check"><input id="appendNumber" type="checkbox" checked> Přidat číslo na konec</label>
+        </div>
+      </form>
+
+      <aside class="card notes-card">
+        <h2>Poznámky</h2>
+        <ul>
+          <li>Žádná CDN, dependency, backend ani storage.</li>
+          <li>Kopírování používá Clipboard API, fallback je označení textu.</li>
+          <li>Entropy hint je orientační, ne audit bezpečnosti.</li>
+          <li>Passphrase používá krátký zabudovaný wordlist v <code>app.js</code>.</li>
+        </ul>
+      </aside>
+    </section>
+  </main>
+</body>
+</html>
