@@ -12,30 +12,30 @@
 :root {
   color-scheme: light dark;
 
-  /* === Colors ====================================================== */
-  --bg: #f4f4f2;
-  --panel: #fbfbfa;
-  --panel-2: #f0f0ed;
-  --panel-soft: #ffffff;
-  --line: #c8c8c2;
-  --line-soft: #deded9;
-  --line-strong: #8f928a;
-  --text: #171a1f;
-  --muted: #626760;
-  --accent: #2458a6;
-  --accent-soft: #e7eefb;
-  --accent-strong: #1f4c8f;
-  --danger: #b42318;
-  --danger-strong: #991e14;
-  --success: #16803c;
-  --warning: #a15c00;
+  /* === Colors — light/dark párováno přes light-dark() ============== */
+  --bg: light-dark(#f4f4f2, #0e1014);
+  --panel: light-dark(#fbfbfa, #15181d);
+  --panel-2: light-dark(#f0f0ed, #1c2026);
+  --panel-soft: light-dark(#ffffff, #1a1d22);
+  --line: light-dark(#c8c8c2, #2a2f37);
+  --line-soft: light-dark(#deded9, #232830);
+  --line-strong: light-dark(#8f928a, #3f4651);
+  --text: light-dark(#171a1f, #e6e8eb);
+  --muted: light-dark(#626760, #8a93a0);
+  --accent: light-dark(#2458a6, #6aa3ff);
+  --accent-soft: light-dark(#e7eefb, #1a2c47);
+  --accent-strong: light-dark(#1f4c8f, #8ab8ff);
+  --danger: light-dark(#b42318, #ef5350);
+  --danger-strong: light-dark(#991e14, #f0625f);
+  --success: light-dark(#16803c, #4ade80);
+  --warning: light-dark(#a15c00, #fbbf24);
 
-  /* Text-on-fill — drží kontrast v dark módu. */
-  --on-accent: #ffffff;
-  --on-danger: #ffffff;
+  /* Text-on-fill — drží kontrast v obou režimech. */
+  --on-accent: light-dark(#ffffff, #0e1014);
+  --on-danger: light-dark(#ffffff, #0e1014);
 
   /* Tlumený translucentní surface (trigger tlačítka, ghost stavy). */
-  --surface-translucent: rgba(255, 255, 255, 0.34);
+  --surface-translucent: light-dark(rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.04));
 
   /* === Typography ================================================== */
   --font-sans: system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -48,52 +48,23 @@
   --radius-lg: 14px;
   --radius-pill: 999px;
 
-  /* === Shadows ===================================================== */
-  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.05);
-  --shadow-md: 0 1px 2px rgba(16, 24, 40, 0.12);
-  --shadow-lg: 0 4px 14px rgba(15, 23, 42, 0.08),
-    0 2px 4px rgba(15, 23, 42, 0.04);
+  /* === Shadows — light-dark() na každé vrstvě (komatový list nelze
+     dát do jednoho light-dark(), tak párujeme vrstvu po vrstvě) ====== */
+  --shadow-sm: light-dark(0 1px 2px rgba(16, 24, 40, 0.05), 0 1px 2px rgba(0, 0, 0, 0.25));
+  --shadow-md: light-dark(0 1px 2px rgba(16, 24, 40, 0.12), 0 1px 2px rgba(0, 0, 0, 0.4));
+  --shadow-lg: light-dark(0 4px 14px rgba(15, 23, 42, 0.08), 0 4px 14px rgba(0, 0, 0, 0.5)),
+    light-dark(0 2px 4px rgba(15, 23, 42, 0.04), 0 2px 4px rgba(0, 0, 0, 0.35));
 
   /* === Motion ====================================================== */
   --transition-base: background-color 150ms ease, border-color 150ms ease,
     color 150ms ease;
   --transition-with-shadow: var(--transition-base), box-shadow 150ms ease;
 
-  /* === Focus rings ================================================= */
+  /* === Focus rings — odvozené z tokenů, platí v obou režimech ====== */
   --ring-accent: 0 0 0 3px var(--accent-soft);
-  --ring-danger: 0 0 0 3px rgba(180, 35, 24, 0.2);
+  --ring-danger: 0 0 0 3px color-mix(in srgb, var(--danger) 22%, transparent);
 
   font-family: var(--font-sans);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0e1014;
-    --panel: #15181d;
-    --panel-2: #1c2026;
-    --panel-soft: #1a1d22;
-    --line: #2a2f37;
-    --line-soft: #232830;
-    --line-strong: #3f4651;
-    --text: #e6e8eb;
-    --muted: #8a93a0;
-    --accent: #6aa3ff;
-    --accent-soft: #1a2c47;
-    --accent-strong: #8ab8ff;
-    --danger: #ef5350;
-    --danger-strong: #f0625f;
-    --success: #4ade80;
-    --warning: #fbbf24;
-    --surface-translucent: rgba(255, 255, 255, 0.04);
-    --on-accent: #0e1014;
-    --on-danger: #0e1014;
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.25);
-    --shadow-md: 0 1px 2px rgba(0, 0, 0, 0.4);
-    --shadow-lg: 0 4px 14px rgba(0, 0, 0, 0.5),
-      0 2px 4px rgba(0, 0, 0, 0.35);
-    --ring-accent: 0 0 0 3px var(--accent-soft);
-    --ring-danger: 0 0 0 3px rgba(239, 83, 80, 0.25);
-  }
 }
 
 * {
@@ -149,8 +120,8 @@ code {
 
 .btn:focus-visible {
   border-color: var(--accent);
-  box-shadow: var(--ring-accent);
-  outline: none;
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .btn:disabled,
@@ -195,7 +166,8 @@ code {
   border-color: var(--danger-strong);
 }
 .btn--destructive:focus-visible {
-  box-shadow: var(--ring-danger);
+  border-color: var(--danger);
+  outline-color: var(--danger);
 }
 
 .btn--outline {
@@ -425,6 +397,7 @@ code {
   border-color: transparent;
   box-shadow: none;
   color: var(--accent);
+  outline: none;
 }
 
 .menu__popup .btn:disabled {
@@ -512,13 +485,13 @@ code {
 }
 
 .badge--danger {
-  background: rgba(180, 35, 24, 0.12);
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
   border-color: transparent;
   color: var(--danger);
 }
 
 .badge--success {
-  background: rgba(22, 128, 60, 0.12);
+  background: color-mix(in srgb, var(--success) 12%, transparent);
   border-color: transparent;
   color: var(--success);
 }
