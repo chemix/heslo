@@ -15,212 +15,212 @@
     'silver', 'spruce', 'summit', 'thunder', 'tiger', 'velvet', 'violet', 'walnut'
   ];
 
-  const hasCrypto = () => Boolean(globalThis.crypto && typeof globalThis.crypto.getRandomValues === 'function');
-
-  function randomUint32() {
-    if (!hasCrypto()) {
-      throw new Error('crypto.getRandomValues is not available');
-    }
-    const values = new Uint32Array(1);
-    globalThis.crypto.getRandomValues(values);
-    return values[0];
-  }
-
   function randomInt(maxExclusive) {
-    if (!Number.isInteger(maxExclusive) || maxExclusive <= 0) {
-      throw new Error('maxExclusive must be a positive integer');
-    }
     const limit = Math.floor(0x100000000 / maxExclusive) * maxExclusive;
+    const values = new Uint32Array(1);
     let value;
     do {
-      value = randomUint32();
+      crypto.getRandomValues(values);
+      value = values[0];
     } while (value >= limit);
     return value % maxExclusive;
   }
 
-  function pick(chars) {
-    return chars[randomInt(chars.length)];
-  }
+  const pick = (chars) => chars[randomInt(chars.length)];
 
   function shuffle(items) {
-    const arr = items.slice();
-    for (let i = arr.length - 1; i > 0; i -= 1) {
+    for (let i = items.length - 1; i > 0; i -= 1) {
       const j = randomInt(i + 1);
-      [arr[i], arr[j]] = [arr[j], arr[i]];
+      [items[i], items[j]] = [items[j], items[i]];
     }
-    return arr;
+    return items;
   }
 
-  function selectedSets(options) {
-    return [
-      options.lowercase ? LOWER : '',
-      options.uppercase ? UPPER : '',
-      options.numbers ? NUMBERS : '',
-      options.symbols ? SYMBOLS : ''
-    ].filter(Boolean);
-  }
-
-  function generatePassword(options) {
-    const length = Number(options.length);
-    const sets = selectedSets(options);
-    if (sets.length === 0) throw new Error('Vyber aspoň jednu znakovou sadu.');
-    if (!Number.isInteger(length) || length < 1) throw new Error('Délka musí být kladné číslo.');
-
-    const allChars = sets.join('');
-    const required = sets.slice(0, Math.min(sets.length, length)).map(pick);
-    const rest = Array.from({ length: Math.max(0, length - required.length) }, () => pick(allChars));
+  function generateRandom(length, sets) {
+    const all = sets.join('');
+    const required = sets.map(pick);
+    const rest = Array.from({ length: length - required.length }, () => pick(all));
     return shuffle(required.concat(rest)).join('');
   }
 
-  function generatePassphrase(options) {
-    const count = Number(options.wordCount);
-    const separator = String(options.separator ?? '-');
-    if (!Number.isInteger(count) || count < 1) throw new Error('Počet slov musí být kladné číslo.');
-
+  function generateMemorable(count) {
     const words = Array.from({ length: count }, () => WORDS[randomInt(WORDS.length)]);
-    const normalized = options.capitalize
-      ? words.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      : words;
-    const suffix = options.appendNumber ? String(randomInt(100)) : '';
-    return normalized.join(separator) + suffix;
+    return words.join('-') + randomInt(100);
   }
 
-  function estimatePasswordEntropy(options) {
-    const sets = selectedSets(options);
-    const poolSize = sets.join('').length;
-    return poolSize > 0 ? Number(options.length) * Math.log2(poolSize) : 0;
-  }
-
-  function estimatePassphraseEntropy(options) {
-    const base = Number(options.wordCount) * Math.log2(WORDS.length);
-    return base + (options.appendNumber ? Math.log2(100) : 0);
-  }
-
-  function strength(entropy) {
-    if (entropy >= 100) return { label: 'Silné', level: 'strong', width: 100 };
-    if (entropy >= 70) return { label: 'OK', level: 'ok', width: 72 };
-    if (entropy >= 45) return { label: 'Slabší', level: 'ok', width: 48 };
-    return { label: 'Slabé', level: 'weak', width: 24 };
-  }
-
-  function init() {
-    const el = {
-      form: document.getElementById('settingsForm'),
-      result: document.getElementById('result'),
-      copyBtn: document.getElementById('copyBtn'),
-      generateBtn: document.getElementById('generateBtn'),
-      copyHint: document.getElementById('copyHint'),
-      cryptoStatus: document.getElementById('cryptoStatus'),
-      modeBadge: document.getElementById('modeBadge'),
-      length: document.getElementById('length'),
-      lengthValue: document.getElementById('lengthValue'),
-      wordCount: document.getElementById('wordCount'),
-      wordCountValue: document.getElementById('wordCountValue'),
-      passwordOptions: document.getElementById('passwordOptions'),
-      passphraseOptions: document.getElementById('passphraseOptions'),
-      meterFill: document.getElementById('meterFill'),
-      strengthLabel: document.getElementById('strengthLabel'),
-      entropyHint: document.getElementById('entropyHint')
+  document.addEventListener('DOMContentLoaded', () => {
+    const result = document.getElementById('result');
+    const copyBtn = document.getElementById('copyBtn');
+    const generateBtn = document.getElementById('generateBtn');
+    const copyHint = document.getElementById('copyHint');
+    const length = document.getElementById('length');
+    const lengthValue = document.getElementById('lengthValue');
+    const wordCount = document.getElementById('wordCount');
+    const wordCountValue = document.getElementById('wordCountValue');
+    const randomOptions = document.getElementById('randomOptions');
+    const memorableOptions = document.getElementById('memorableOptions');
+    const boxes = {
+      lowercase: document.getElementById('lowercase'),
+      uppercase: document.getElementById('uppercase'),
+      numbers: document.getElementById('numbers'),
+      symbols: document.getElementById('symbols')
     };
 
-    const getOptions = () => ({
-      mode: new FormData(el.form).get('mode'),
-      length: Number(el.length.value),
-      lowercase: document.getElementById('lowercase').checked,
-      uppercase: document.getElementById('uppercase').checked,
-      numbers: document.getElementById('numbers').checked,
-      symbols: document.getElementById('symbols').checked,
-      wordCount: Number(el.wordCount.value),
-      separator: document.getElementById('separator').value,
-      capitalize: document.getElementById('capitalize').checked,
-      appendNumber: document.getElementById('appendNumber').checked
-    });
+    const mode = () => document.querySelector('input[name="mode"]:checked').value;
 
-    const setCryptoStatus = () => {
-      const dot = el.cryptoStatus.querySelector('.dot');
-      if (hasCrypto()) {
-        dot.className = 'dot dot--connected';
-        el.cryptoStatus.lastChild.textContent = ' crypto.getRandomValues active';
-      } else {
-        dot.className = 'dot dot--error';
-        el.cryptoStatus.lastChild.textContent = ' crypto API není dostupné';
-        el.generateBtn.disabled = true;
+    // Returns a password using the current settings, or null if random mode
+    // has no character set selected (caller reports the error).
+    const generateOne = () => {
+      if (mode() === 'memorable') {
+        return generateMemorable(Number(wordCount.value));
       }
+      const sets = [
+        boxes.lowercase.checked ? LOWER : '',
+        boxes.uppercase.checked ? UPPER : '',
+        boxes.numbers.checked ? NUMBERS : '',
+        boxes.symbols.checked ? SYMBOLS : ''
+      ].filter(Boolean);
+      if (sets.length === 0) return null;
+      return generateRandom(Number(length.value), sets);
     };
 
-    const updateMode = () => {
-      const options = getOptions();
-      const passphrase = options.mode === 'passphrase';
-      el.passwordOptions.hidden = passphrase;
-      el.passphraseOptions.hidden = !passphrase;
-      el.modeBadge.textContent = passphrase ? 'Passphrase' : 'Password';
-      updateEntropy(options);
-    };
-
-    const updateEntropy = (options = getOptions()) => {
-      const entropy = options.mode === 'passphrase'
-        ? estimatePassphraseEntropy(options)
-        : estimatePasswordEntropy(options);
-      const info = strength(entropy);
-      el.meterFill.style.width = `${info.width}%`;
-      el.meterFill.dataset.level = info.level;
-      el.strengthLabel.textContent = info.label;
-      el.entropyHint.textContent = `${Math.round(entropy)} bitů odhadované entropie`;
-    };
-
-    const generate = () => {
-      try {
-        const options = getOptions();
-        el.result.value = options.mode === 'passphrase'
-          ? generatePassphrase(options)
-          : generatePassword(options);
-        updateEntropy(options);
-        el.copyHint.textContent = 'Vygenerováno lokálně v prohlížeči.';
-      } catch (error) {
-        el.copyHint.textContent = error.message;
+    const run = () => {
+      copyHint.textContent = '';
+      const pw = generateOne();
+      if (pw === null) {
+        copyHint.textContent = 'Vyber aspoň jednu znakovou sadu.';
+        return;
       }
+      result.value = pw;
+    };
+
+    const COPY_ICON = copyBtn.innerHTML;
+    const CHECK_ICON = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>';
+
+    let copyResetTimer;
+    const flashCopied = () => {
+      clearTimeout(copyResetTimer);
+      copyBtn.innerHTML = CHECK_ICON;
+      copyBtn.classList.add('copy-btn--done');
+      copyResetTimer = setTimeout(() => {
+        copyBtn.innerHTML = COPY_ICON;
+        copyBtn.classList.remove('copy-btn--done');
+      }, 1200);
     };
 
     const copy = async () => {
-      if (!el.result.value) generate();
-      el.result.focus();
-      el.result.select();
+      if (!result.value) run();
       try {
-        if (navigator.clipboard && window.isSecureContext) {
-          await navigator.clipboard.writeText(el.result.value);
-          el.copyHint.textContent = 'Zkopírováno do schránky.';
-        } else {
-          document.execCommand('copy');
-          el.copyHint.textContent = 'Zkopírováno fallback metodou.';
-        }
+        await navigator.clipboard.writeText(result.value);
       } catch {
-        el.copyHint.textContent = 'Nepodařilo se kopírovat automaticky — text je označený.';
+        result.select();
       }
+      flashCopied();
     };
 
-    el.length.addEventListener('input', () => { el.lengthValue.textContent = el.length.value; updateEntropy(); });
-    el.wordCount.addEventListener('input', () => { el.wordCountValue.textContent = el.wordCount.value; updateEntropy(); });
-    el.form.addEventListener('input', updateMode);
-    el.generateBtn.addEventListener('click', generate);
-    el.copyBtn.addEventListener('click', copy);
+    const updateMode = () => {
+      const memorable = mode() === 'memorable';
+      randomOptions.hidden = memorable;
+      memorableOptions.hidden = !memorable;
+      run();
+    };
 
-    setCryptoStatus();
-    updateMode();
-    if (hasCrypto()) generate();
-  }
+    // --- Dropdown menu (caret next to Generate) ---
+    const moreBtn = document.getElementById('moreBtn');
+    const moreMenu = document.getElementById('moreMenu');
 
-  globalThis.PasswordMvp = {
-    WORDS,
-    hasCrypto,
-    randomInt,
-    generatePassword,
-    generatePassphrase,
-    estimatePasswordEntropy,
-    estimatePassphraseEntropy,
-    strength
-  };
+    const toggleMenu = (open) => {
+      const show = open ?? moreMenu.hidden;
+      moreMenu.hidden = !show;
+      moreBtn.setAttribute('aria-expanded', String(show));
+    };
 
-  if (typeof document !== 'undefined') {
-    document.addEventListener('DOMContentLoaded', init);
-  }
+    moreBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleMenu(); });
+    document.addEventListener('click', () => toggleMenu(false));
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') toggleMenu(false); });
+
+    // --- Bulk: 10 passwords into a table ---
+    const tableCard = document.getElementById('tableCard');
+    const tableBody = document.getElementById('tableBody');
+    const tableHint = document.getElementById('tableHint');
+    const bulkBtn = document.getElementById('bulkBtn');
+    const copyTableBtn = document.getElementById('copyTableBtn');
+
+    const generateTable = () => {
+      const rows = [];
+      for (let i = 0; i < 10; i += 1) {
+        const pw = generateOne();
+        if (pw === null) {
+          tableHint.textContent = 'Vyber aspoň jednu znakovou sadu.';
+          return false;
+        }
+        rows.push(pw);
+      }
+      tableBody.innerHTML = '';
+      rows.forEach((pw, i) => {
+        const tr = document.createElement('tr');
+
+        const num = document.createElement('td');
+        num.className = 'col-num';
+        num.textContent = String(i + 1);
+
+        const userCell = document.createElement('td');
+        const userInput = document.createElement('input');
+        userInput.className = 'input username-input';
+        userInput.type = 'text';
+        userInput.placeholder = 'username';
+        userInput.autocomplete = 'off';
+        userInput.spellcheck = false;
+        userCell.appendChild(userInput);
+
+        const pwCell = document.createElement('td');
+        pwCell.className = 'pw-cell';
+        pwCell.textContent = pw;
+
+        tr.append(num, userCell, pwCell);
+        tableBody.appendChild(tr);
+      });
+      tableHint.textContent = '';
+      return true;
+    };
+
+    bulkBtn.addEventListener('click', () => {
+      toggleMenu(false);
+      if (generateTable()) tableCard.hidden = false;
+    });
+
+    // Build an ASCII table from the current usernames + passwords
+    const asciiTable = () => {
+      const rows = Array.from(tableBody.querySelectorAll('tr')).map((tr) => ({
+        user: tr.querySelector('.username-input').value.trim(),
+        pass: tr.querySelector('.pw-cell').textContent
+      }));
+      const headers = ['Username', 'Password'];
+      const widths = headers.map((h, c) => {
+        const cells = rows.map((r) => (c === 0 ? r.user : r.pass));
+        return Math.max(h.length, ...cells.map((s) => s.length));
+      });
+      const sep = '+' + widths.map((w) => '-'.repeat(w + 2)).join('+') + '+';
+      const line = (cells) => '| ' + cells.map((s, c) => s.padEnd(widths[c])).join(' | ') + ' |';
+      return [sep, line(headers), sep, ...rows.map((r) => line([r.user, r.pass])), sep].join('\n');
+    };
+
+    let tableCopyTimer;
+    copyTableBtn.addEventListener('click', async () => {
+      const text = asciiTable();
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch { /* clipboard unavailable; ignore */ }
+      clearTimeout(tableCopyTimer);
+      copyTableBtn.textContent = 'Zkopírováno';
+      tableCopyTimer = setTimeout(() => { copyTableBtn.textContent = 'Kopírovat tabulku'; }, 1200);
+    });
+
+    length.addEventListener('input', () => { lengthValue.textContent = length.value; });
+    wordCount.addEventListener('input', () => { wordCountValue.textContent = wordCount.value; });
+    document.querySelectorAll('input[name="mode"]').forEach((r) => r.addEventListener('change', updateMode));
+    generateBtn.addEventListener('click', run);
+    copyBtn.addEventListener('click', copy);
+    run();
+  });
 })();
