@@ -21,17 +21,13 @@
       <section class="card" id="generatorCard" role="tabpanel" aria-labelledby="tab-random">
 
       <div class="result-row">
-        <label class="sr-only" for="result">Vygenerované heslo</label>
-        <input class="input input--lg result-input" id="result" type="text" readonly spellcheck="false" autocomplete="off" value="">
         <button class="btn btn--outline copy-btn" id="copyBtn" type="button" aria-label="Kopírovat" title="Kopírovat">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <rect x="9" y="9" width="11" height="11" rx="2"></rect>
             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
           </svg>
         </button>
-      </div>
-
-      <div class="controls-row">
+        <div class="input input--lg result-input" id="result" role="button" tabindex="0" aria-label="Vygenerované heslo — kliknutím zkopírujete" title="Kliknutím zkopírujete"></div>
         <div class="generate-group">
           <button class="btn btn--default btn--lg" id="generateBtn" type="button">Generate</button>
           <button class="btn btn--default btn--lg generate-caret" id="moreBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Další možnosti">

@@ -100,7 +100,7 @@
     // Scale the result font down as the password gets longer so short ones
     // read large and long ones still fit on one line.
     const adjustResultFontSize = () => {
-      const len = result.value.length;
+      const len = result.textContent.length;
       if (!len) { result.style.fontSize = ''; return; }
       const clamped = Math.max(12, Math.min(100, len));
       const t = (clamped - 12) / (100 - 12);
@@ -114,7 +114,7 @@
         copyHint.textContent = NO_SET_MSG;
         return;
       }
-      result.value = pw;
+      result.textContent = pw;
       adjustResultFontSize();
     };
 
@@ -122,25 +122,45 @@
     const CHECK_ICON = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>';
 
     let copyResetTimer;
+    // Copy feedback is just the icon swap on the button — no color change.
     const flashCopied = () => {
       clearTimeout(copyResetTimer);
       copyBtn.innerHTML = CHECK_ICON;
-      copyBtn.classList.add('copy-btn--done');
       copyResetTimer = setTimeout(() => {
         copyBtn.innerHTML = COPY_ICON;
-        copyBtn.classList.remove('copy-btn--done');
       }, 1200);
     };
 
+    // Fallback copy when the clipboard API is blocked: copy via an off-screen
+    // textarea so the visible password is never selected or hidden.
+    const legacyCopy = (text) => {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none;';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); } catch { /* ignore */ }
+      document.body.removeChild(ta);
+    };
+
     const copy = async () => {
-      if (!result.value) run();
+      if (!result.textContent) run();
+      const text = result.textContent;
+      if (!text) return;
       try {
-        await navigator.clipboard.writeText(result.value);
+        await navigator.clipboard.writeText(text);
       } catch {
-        result.select();
+        legacyCopy(text);
       }
       flashCopied();
     };
+
+    // The result itself is the primary copy affordance (clickable / keyboard).
+    result.addEventListener('click', copy);
+    result.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); copy(); }
+    });
 
     // --- Dropdown menu (caret next to Generate) ---
     const moreBtn = document.getElementById('moreBtn');

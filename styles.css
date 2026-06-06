@@ -32,9 +32,17 @@
 .result-input {
   flex: 1;
   min-width: 0;
+  display: flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
   font-family: var(--font-mono);
   font-size: clamp(1rem, 2.2vw, 1.35rem);
+  white-space: nowrap;
+  cursor: pointer;
 }
+
+.result-input:empty { cursor: default; }
 
 .copy-btn {
   flex: 0 0 auto;
@@ -45,20 +53,9 @@
   width: 2.75rem;
 }
 
-.copy-btn--done {
-  color: var(--success);
-  border-color: var(--success);
-}
-
-.controls-row {
-  display: flex;
-  align-items: stretch;
-  gap: 0.6rem;
-}
-
 .generate-group {
   position: relative;
-  flex: 1;
+  flex: 0 0 auto;
   display: flex;
 }
 
