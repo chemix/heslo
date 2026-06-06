@@ -1,5 +1,5 @@
 .page-shell {
-  width: min(32rem, calc(100vw - 2rem));
+  width: min(64rem, calc(100vw - 2rem));
   margin: 0 auto;
   padding: 3rem 0;
 }
@@ -129,10 +129,52 @@
   accent-color: var(--accent);
 }
 
+/* Password settings on one line: length input + charset toggles */
+.settings-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Count picker (length / word count): presets trigger + narrow input + unit */
+.count-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 0 0 auto;
+}
+
+.count-input {
+  flex: 0 0 auto;
+  width: 4rem;
+  text-align: center;
+  font-family: var(--font-mono);
+}
+
+.count-unit {
+  color: var(--muted);
+}
+
+.count-presets-wrap {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.count-presets {
+  min-width: 8rem;
+}
+
+.count-presets[hidden] {
+  display: none;
+}
+
 .toggles {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0.6rem;
+  flex: 1;
+  min-width: 18rem;
 }
 
 .toggles label {

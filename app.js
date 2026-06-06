@@ -56,9 +56,7 @@
     const generateBtn = document.getElementById('generateBtn');
     const copyHint = document.getElementById('copyHint');
     const length = document.getElementById('length');
-    const lengthValue = document.getElementById('lengthValue');
     const wordCount = document.getElementById('wordCount');
-    const wordCountValue = document.getElementById('wordCountValue');
     const randomOptions = document.getElementById('randomOptions');
     const memorableOptions = document.getElementById('memorableOptions');
     const boxes = {
@@ -68,13 +66,22 @@
       symbols: document.getElementById('symbols')
     };
 
+    // Parse an integer input, defaulting and clamping into [min, max].
+    const readCount = (input, min, max, fallback) => {
+      const v = parseInt(input.value, 10);
+      return Math.max(min, Math.min(max, Number.isFinite(v) ? v : fallback));
+    };
+
+    const readLength = () => readCount(length, 4, 256, 32);
+    const readWordCount = () => readCount(wordCount, 2, 12, 4);
+
     const mode = () => document.querySelector('input[name="mode"]:checked').value;
 
     // Returns a password using the current settings, or null if random mode
     // has no character set selected (caller reports the error).
     const generateOne = () => {
       if (mode() === 'memorable') {
-        return generateMemorable(Number(wordCount.value));
+        return generateMemorable(readWordCount());
       }
       const sets = [
         boxes.lowercase.checked ? LOWER : '',
@@ -83,7 +90,17 @@
         boxes.symbols.checked ? SYMBOLS : ''
       ].filter(Boolean);
       if (sets.length === 0) return null;
-      return generateRandom(Number(length.value), sets);
+      return generateRandom(readLength(), sets);
+    };
+
+    // Scale the result font down as the password gets longer so short ones
+    // read large and long ones still fit on one line.
+    const adjustResultFontSize = () => {
+      const len = result.value.length;
+      if (!len) { result.style.fontSize = ''; return; }
+      const clamped = Math.max(12, Math.min(100, len));
+      const t = (clamped - 12) / (100 - 12);
+      result.style.fontSize = (1.6 - t * (1.6 - 0.72)).toFixed(3) + 'rem';
     };
 
     const run = () => {
@@ -94,6 +111,7 @@
         return;
       }
       result.value = pw;
+      adjustResultFontSize();
     };
 
     const COPY_ICON = copyBtn.innerHTML;
@@ -138,8 +156,39 @@
     };
 
     moreBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleMenu(); });
-    document.addEventListener('click', () => toggleMenu(false));
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') toggleMenu(false); });
+
+    // --- Count presets popovers (length + word count) ---
+    // Wire a "presets" popover button to an input: clicking a preset fills the
+    // input and regenerates; a hand-typed value is normalized on change.
+    // Returns a closer so the document-level handlers can dismiss it.
+    const setupPresets = (btnId, popupId, input, normalize) => {
+      const btn = document.getElementById(btnId);
+      const popup = document.getElementById(popupId);
+      const toggle = (open) => {
+        const show = open ?? popup.hidden;
+        popup.hidden = !show;
+        btn.setAttribute('aria-expanded', String(show));
+      };
+      btn.addEventListener('click', (e) => { e.stopPropagation(); toggle(); });
+      popup.addEventListener('click', (e) => {
+        const preset = e.target.closest('button[data-value]');
+        if (!preset) return;
+        input.value = preset.dataset.value;
+        toggle(false);
+        run();
+      });
+      input.addEventListener('change', () => { input.value = String(normalize()); run(); });
+      return () => toggle(false);
+    };
+
+    const closePresets = [
+      setupPresets('lengthPresetsBtn', 'lengthPresets', length, readLength),
+      setupPresets('wordCountPresetsBtn', 'wordCountPresets', wordCount, readWordCount)
+    ];
+
+    const closeAllMenus = () => { toggleMenu(false); closePresets.forEach((close) => close()); };
+    document.addEventListener('click', closeAllMenus);
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeAllMenus(); });
 
     // --- Bulk: passwords into a table ---
     const generatorCard = document.getElementById('generatorCard');
@@ -258,8 +307,6 @@
       tableCopyTimer = setTimeout(() => { copyTableBtn.textContent = 'Kopírovat tabulku'; }, 1200);
     });
 
-    length.addEventListener('input', () => { lengthValue.textContent = length.value; });
-    wordCount.addEventListener('input', () => { wordCountValue.textContent = wordCount.value; });
     document.querySelectorAll('input[name="mode"]').forEach((r) => r.addEventListener('change', updateMode));
     generateBtn.addEventListener('click', run);
     copyBtn.addEventListener('click', copy);

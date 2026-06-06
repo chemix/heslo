@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Password Generator</title>
   <meta name="robots" content="noindex, nofollow">
-  <link rel="stylesheet" href="/kostra.css?v=12">
-  <link rel="stylesheet" href="/styles.css?v=12">
-  <script defer src="/app.js?v=12"></script>
+  <link rel="stylesheet" href="/kostra.css?v=17">
+  <link rel="stylesheet" href="/styles.css?v=17">
+  <script defer src="/app.js?v=17"></script>
 </head>
 <body>
   <main class="page-shell">
@@ -44,24 +44,54 @@
       </div>
 
       <div id="randomOptions">
-        <label class="field">
-          <span>Délka: <strong id="lengthValue">20</strong></span>
-          <input id="length" type="range" min="8" max="64" value="20">
-        </label>
+        <div class="settings-row">
+          <div class="count-row">
+            <div class="count-presets-wrap">
+              <button class="btn btn--outline btn--icon count-presets-btn" id="lengthPresetsBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Předvolby délky">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="m6 9 6 6 6-6"></path>
+                </svg>
+              </button>
+              <div class="menu__popup count-presets" id="lengthPresets" role="menu" hidden>
+                <button class="btn" type="button" role="menuitem" data-value="8">8 znaků</button>
+                <button class="btn" type="button" role="menuitem" data-value="16">16 znaků</button>
+                <button class="btn" type="button" role="menuitem" data-value="32">32 znaků</button>
+                <button class="btn" type="button" role="menuitem" data-value="64">64 znaků</button>
+                <button class="btn" type="button" role="menuitem" data-value="128">128 znaků</button>
+              </div>
+            </div>
+            <input id="length" class="input count-input" type="text" value="32" inputmode="numeric" autocomplete="off" aria-label="Délka hesla">
+            <span class="count-unit">znaků</span>
+          </div>
 
-        <div class="toggles" aria-label="Znakové sady">
-          <label><input id="lowercase" type="checkbox" checked> a-z</label>
-          <label><input id="uppercase" type="checkbox" checked> A-Z</label>
-          <label><input id="numbers" type="checkbox" checked> 0-9</label>
-          <label><input id="symbols" type="checkbox" checked> !@#</label>
+          <div class="toggles" aria-label="Znakové sady">
+            <label><input id="lowercase" type="checkbox" checked> a-z</label>
+            <label><input id="uppercase" type="checkbox" checked> A-Z</label>
+            <label><input id="numbers" type="checkbox" checked> 0-9</label>
+            <label><input id="symbols" type="checkbox" checked> !@#</label>
+          </div>
         </div>
       </div>
 
       <div id="memorableOptions" hidden>
-        <label class="field">
-          <span>Počet slov: <strong id="wordCountValue">4</strong></span>
-          <input id="wordCount" type="range" min="3" max="8" value="4">
-        </label>
+        <div class="count-row">
+          <div class="count-presets-wrap">
+            <button class="btn btn--outline btn--icon count-presets-btn" id="wordCountPresetsBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Předvolby počtu slov">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="m6 9 6 6 6-6"></path>
+              </svg>
+            </button>
+            <div class="menu__popup count-presets" id="wordCountPresets" role="menu" hidden>
+              <button class="btn" type="button" role="menuitem" data-value="3">3 slova</button>
+              <button class="btn" type="button" role="menuitem" data-value="4">4 slova</button>
+              <button class="btn" type="button" role="menuitem" data-value="5">5 slov</button>
+              <button class="btn" type="button" role="menuitem" data-value="6">6 slov</button>
+              <button class="btn" type="button" role="menuitem" data-value="8">8 slov</button>
+            </div>
+          </div>
+          <input id="wordCount" class="input count-input" type="text" value="4" inputmode="numeric" autocomplete="off" aria-label="Počet slov">
+          <span class="count-unit">slov</span>
+        </div>
       </div>
 
       <span class="hint" id="copyHint" aria-live="polite"></span>
