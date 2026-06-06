@@ -369,6 +369,71 @@ code {
   margin-top: 0;
 }
 
+/* === Tabs (.tabbar / .tabs / .tab) — folder tabs over a panel ===== */
+/* The tab strip sits on a baseline rule; the active tab borrows the
+   panel's background + border and overlaps the rule (margin-bottom: -1px)
+   so it reads as one continuous surface with the content below. */
+.tabbar {
+  align-items: flex-end;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  gap: 0.6rem;
+  padding: 0 0.25rem;
+}
+.tabs {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  gap: 0.15rem;
+  margin-bottom: -1px;
+  min-width: 0;
+}
+.tab {
+  align-items: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  color: var(--muted);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-weight: 550;
+  gap: 0.5rem;
+  padding: 0.5rem 0.95rem;
+  transition: var(--transition-base);
+  white-space: nowrap;
+}
+/* Optional dismiss affordance inside a closable tab (e.g. an opened view). */
+.tab-close {
+  border-radius: var(--radius-xs);
+  color: var(--muted);
+  line-height: 1;
+  margin: -0.15rem -0.35rem -0.15rem 0;
+  padding: 0.1rem 0.3rem;
+}
+.tab-close:hover {
+  background: var(--line);
+  color: var(--text);
+}
+.tab:hover:not([disabled]) {
+  background: var(--panel-soft);
+  color: var(--text);
+}
+.tab[aria-selected="true"] {
+  background: var(--panel);
+  border-color: var(--line);
+  color: var(--text);
+}
+.tab[disabled] {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+.tab:focus-visible {
+  box-shadow: var(--ring-accent);
+  outline: none;
+}
+
 /* === Table (.table) ============================================== */
 .table {
   border: 1px solid var(--line);

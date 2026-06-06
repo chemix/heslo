@@ -5,14 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Password Generator</title>
   <meta name="robots" content="noindex, nofollow">
-  <link rel="stylesheet" href="/kostra.css?v=17">
-  <link rel="stylesheet" href="/styles.css?v=17">
-  <script defer src="/app.js?v=17"></script>
+  <link rel="stylesheet" href="/kostra.css?v=20">
+  <link rel="stylesheet" href="/styles.css?v=20">
+  <script defer src="/app.js?v=20"></script>
 </head>
 <body>
   <main class="page-shell">
-    <section class="card" id="generatorCard">
-      <h1>Password Generator</h1>
+    <div class="generator">
+      <div class="tabbar">
+        <div class="tabs" role="tablist" aria-label="Typ hesla">
+          <button class="tab" id="tab-random" type="button" role="tab" data-mode="random" aria-selected="true" aria-controls="generatorCard">Random</button>
+          <button class="tab" id="tab-memorable" type="button" role="tab" data-mode="memorable" aria-selected="false" aria-controls="generatorCard">Memorable</button>
+        </div>
+      </div>
+      <section class="card" id="generatorCard" role="tabpanel" aria-labelledby="tab-random">
 
       <div class="result-row">
         <label class="sr-only" for="result">Vygenerované heslo</label>
@@ -26,10 +32,6 @@
       </div>
 
       <div class="controls-row">
-        <div class="segmented" role="group" aria-label="Režim">
-          <label><input type="radio" name="mode" value="random" checked> Random</label>
-          <label><input type="radio" name="mode" value="memorable"> Memorable</label>
-        </div>
         <div class="generate-group">
           <button class="btn btn--default btn--lg" id="generateBtn" type="button">Generate</button>
           <button class="btn btn--default btn--lg generate-caret" id="moreBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Další možnosti">
@@ -95,9 +97,9 @@
       </div>
 
       <span class="hint" id="copyHint" aria-live="polite"></span>
-    </section>
+      </section>
 
-    <section class="card table-card" id="tableCard" hidden>
+      <section class="card table-card" id="tableCard" role="tabpanel" hidden>
       <div class="table-head">
         <h2>Hesla</h2>
         <button class="btn btn--outline" id="copyTableBtn" type="button">Kopírovat tabulku</button>
@@ -110,7 +112,8 @@
       </table>
       <button class="btn btn--outline add-row-btn" id="addRowBtn" type="button">+ Přidat řádek</button>
       <span class="hint" id="tableHint" aria-live="polite"></span>
-    </section>
+      </section>
+    </div>
   </main>
 </body>
 </html>

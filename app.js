@@ -75,7 +75,11 @@
     const readLength = () => readCount(length, 4, 256, 32);
     const readWordCount = () => readCount(wordCount, 2, 12, 4);
 
-    const mode = () => document.querySelector('input[name="mode"]:checked').value;
+    // The generation mode is owned by the Random/Memorable tabs; the Tabulka
+    // tab is a separate view that must not disturb it, so keep the mode in
+    // state instead of reading it back off whichever tab is selected.
+    let currentMode = 'random';
+    const mode = () => currentMode;
 
     // Returns a password using the current settings, or null if random mode
     // has no character set selected (caller reports the error).
@@ -138,13 +142,6 @@
       flashCopied();
     };
 
-    const updateMode = () => {
-      const memorable = mode() === 'memorable';
-      randomOptions.hidden = memorable;
-      memorableOptions.hidden = !memorable;
-      run();
-    };
-
     // --- Dropdown menu (caret next to Generate) ---
     const moreBtn = document.getElementById('moreBtn');
     const moreMenu = document.getElementById('moreMenu');
@@ -198,6 +195,67 @@
     const bulkBtn = document.getElementById('bulkBtn');
     const addRowBtn = document.getElementById('addRowBtn');
     const copyTableBtn = document.getElementById('copyTableBtn');
+
+    // --- Tabs: Random / Memorable pick the generator mode; a Tabulka tab is
+    // created on demand for the bulk table, can be returned to at any time, and
+    // closes back to the generator. ---
+    const tabsEl = document.querySelector('.tabs');
+
+    // Reveal exactly one panel and highlight exactly one tab.
+    const showPanel = (tab) => {
+      document.querySelectorAll('.tab').forEach((t) => t.setAttribute('aria-selected', String(t === tab)));
+      const toTable = tab.dataset.target === 'tableCard';
+      generatorCard.hidden = toTable;
+      tableCard.hidden = !toTable;
+      (toTable ? tableCard : generatorCard).setAttribute('aria-labelledby', tab.id);
+    };
+
+    // A generator tab carries the mode: activating it shows the matching
+    // options and rerolls the single-password view.
+    const selectMode = (tab) => {
+      currentMode = tab.dataset.mode;
+      const memorable = currentMode === 'memorable';
+      randomOptions.hidden = memorable;
+      memorableOptions.hidden = !memorable;
+      showPanel(tab);
+      run();
+    };
+    document.querySelectorAll('.tab[data-mode]').forEach((t) => t.addEventListener('click', () => selectMode(t)));
+
+    // The Tabulka tab is created lazily and reused; closing it drops the table
+    // and returns to the generator tab for the current mode.
+    let tableTab = null;
+    const closeTableTab = () => {
+      if (!tableTab) return;
+      const wasActive = tableTab.getAttribute('aria-selected') === 'true';
+      tableTab.remove();
+      tableTab = null;
+      tableBody.innerHTML = '';
+      if (wasActive) selectMode(document.getElementById(mode() === 'memorable' ? 'tab-memorable' : 'tab-random'));
+      else tableCard.hidden = true;
+    };
+    const ensureTableTab = () => {
+      if (tableTab) return tableTab;
+      tableTab = document.createElement('button');
+      tableTab.type = 'button';
+      tableTab.className = 'tab';
+      tableTab.id = 'tab-table';
+      tableTab.dataset.target = 'tableCard';
+      tableTab.setAttribute('role', 'tab');
+      tableTab.setAttribute('aria-controls', 'tableCard');
+      tableTab.setAttribute('aria-selected', 'false');
+      tableTab.innerHTML = '<span class="tab-label">Tabulka</span>'
+        + '<span class="tab-close" title="Zavřít tabulku" aria-hidden="true">×</span>';
+      tableTab.addEventListener('click', (e) => {
+        if (e.target.closest('.tab-close')) closeTableTab();
+        else showPanel(tableTab);
+      });
+      tableTab.addEventListener('keydown', (e) => {
+        if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); closeTableTab(); }
+      });
+      tabsEl.appendChild(tableTab);
+      return tableTab;
+    };
 
     // Roll a password; on failure (no charset selected) show the table hint
     // and return null so the caller can bail.
@@ -272,10 +330,7 @@
 
     bulkBtn.addEventListener('click', () => {
       toggleMenu(false);
-      if (generateTable()) {
-        tableCard.hidden = false;
-        generatorCard.hidden = true;
-      }
+      if (generateTable()) showPanel(ensureTableTab());
     });
 
     addRowBtn.addEventListener('click', addRow);
@@ -307,7 +362,6 @@
       tableCopyTimer = setTimeout(() => { copyTableBtn.textContent = 'Kopírovat tabulku'; }, 1200);
     });
 
-    document.querySelectorAll('input[name="mode"]').forEach((r) => r.addEventListener('change', updateMode));
     generateBtn.addEventListener('click', run);
     copyBtn.addEventListener('click', copy);
     run();
