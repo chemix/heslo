@@ -105,6 +105,43 @@
     let currentMode = 'random';
     const mode = () => currentMode;
 
+    const STORAGE_KEY = 'pwgen';
+
+    const saveSettings = () => {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+          mode: currentMode,
+          length: length.value,
+          wordCount: wordCount.value,
+          lowercase: boxes.lowercase.checked,
+          uppercase: boxes.uppercase.checked,
+          numbers: boxes.numbers.checked,
+          symbols: boxes.symbols.checked,
+          nature: dictBoxes.nature.checked,
+          space: dictBoxes.space.checked,
+          animals: dictBoxes.animals.checked,
+          colors: dictBoxes.colors.checked,
+          pin: pinToggle.checked,
+        }));
+      } catch { /* storage unavailable */ }
+    };
+
+    const loadSettings = () => {
+      let s;
+      try { s = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); } catch { s = null; }
+      if (!s) return;
+      if (s.length != null) length.value = s.length;
+      if (s.wordCount != null) wordCount.value = s.wordCount;
+      for (const [key, el] of Object.entries(boxes)) {
+        if (s[key] != null) el.checked = s[key];
+      }
+      for (const [key, el] of Object.entries(dictBoxes)) {
+        if (s[key] != null) el.checked = s[key];
+      }
+      if (s.pin != null) pinToggle.checked = s.pin;
+      if (s.mode === 'memorable') selectMode(document.getElementById('tab-memorable'));
+    };
+
     // Returns a password using the current settings, or null if random mode
     // has no character set selected (caller reports the error).
     const generateOne = () => {
@@ -228,6 +265,7 @@
         input.value = preset.dataset.value;
         toggle(false);
         run();
+        saveSettings();
       });
       input.addEventListener('change', () => { input.value = String(normalize()); run(); });
       return () => toggle(false);
@@ -275,7 +313,7 @@
       showPanel(tab);
       run();
     };
-    document.querySelectorAll('.tab[data-mode]').forEach((t) => t.addEventListener('click', () => selectMode(t)));
+    document.querySelectorAll('.tab[data-mode]').forEach((t) => t.addEventListener('click', () => { selectMode(t); saveSettings(); }));
 
     // The Tabulka tab is created lazily and reused; closing it drops the table
     // and returns to the generator tab for the current mode.
@@ -419,6 +457,13 @@
 
     generateBtn.addEventListener('click', run);
     copyBtn.addEventListener('click', copy);
+
+    [...Object.values(boxes), ...Object.values(dictBoxes), pinToggle]
+      .forEach((el) => el.addEventListener('change', saveSettings));
+    length.addEventListener('change', saveSettings);
+    wordCount.addEventListener('change', saveSettings);
+
+    loadSettings();
     run();
   });
 })();
