@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Password Generator</title>
   <meta name="robots" content="noindex, nofollow">
-  <link rel="stylesheet" href="/kostra.css?v=20">
-  <link rel="stylesheet" href="/styles.css?v=20">
-  <script defer src="/app.js?v=20"></script>
+  <link rel="stylesheet" href="/kostra.css?v=22">
+  <link rel="stylesheet" href="/styles.css?v=22">
+  <script defer src="/app.js?v=22"></script>
 </head>
 <body>
   <main class="page-shell">
@@ -72,23 +72,33 @@
       </div>
 
       <div id="memorableOptions" hidden>
-        <div class="count-row">
-          <div class="count-presets-wrap">
-            <button class="btn btn--outline btn--icon count-presets-btn" id="wordCountPresetsBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Předvolby počtu slov">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="m6 9 6 6 6-6"></path>
-              </svg>
-            </button>
-            <div class="menu__popup count-presets" id="wordCountPresets" role="menu" hidden>
-              <button class="btn" type="button" role="menuitem" data-value="3">3 slova</button>
-              <button class="btn" type="button" role="menuitem" data-value="4">4 slova</button>
-              <button class="btn" type="button" role="menuitem" data-value="5">5 slov</button>
-              <button class="btn" type="button" role="menuitem" data-value="6">6 slov</button>
-              <button class="btn" type="button" role="menuitem" data-value="8">8 slov</button>
+        <div class="settings-row">
+          <div class="count-row">
+            <div class="count-presets-wrap">
+              <button class="btn btn--outline btn--icon count-presets-btn" id="wordCountPresetsBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Předvolby počtu slov">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="m6 9 6 6 6-6"></path>
+                </svg>
+              </button>
+              <div class="menu__popup count-presets" id="wordCountPresets" role="menu" hidden>
+                <button class="btn" type="button" role="menuitem" data-value="3">3 slova</button>
+                <button class="btn" type="button" role="menuitem" data-value="4">4 slova</button>
+                <button class="btn" type="button" role="menuitem" data-value="5">5 slov</button>
+                <button class="btn" type="button" role="menuitem" data-value="6">6 slov</button>
+                <button class="btn" type="button" role="menuitem" data-value="8">8 slov</button>
+              </div>
             </div>
+            <input id="wordCount" class="input count-input" type="text" value="4" inputmode="numeric" autocomplete="off" aria-label="Počet slov">
+            <span class="count-unit">slov</span>
           </div>
-          <input id="wordCount" class="input count-input" type="text" value="4" inputmode="numeric" autocomplete="off" aria-label="Počet slov">
-          <span class="count-unit">slov</span>
+
+          <div class="toggles toggles--dict" aria-label="Slovníky">
+            <label><input id="dictNature" type="checkbox" checked> Příroda</label>
+            <label><input id="dictSpace" type="checkbox" checked> Vesmír</label>
+            <label><input id="dictAnimals" type="checkbox" checked> Zvířata</label>
+            <label><input id="dictColors" type="checkbox" checked> Barvy</label>
+            <label><input id="pinToggle" type="checkbox" checked> PIN</label>
+          </div>
         </div>
       </div>
 

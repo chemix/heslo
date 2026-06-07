@@ -5,17 +5,32 @@
   const UPPER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   const NUMBERS = '0123456789';
   const SYMBOLS = '!@#$%^&*()-_=+[]{};:,.?/';
-  const WORDS = [
-    'amber', 'atlas', 'breeze', 'brick', 'canyon', 'cedar', 'cipher', 'clover',
-    'comet', 'copper', 'delta', 'ember', 'falcon', 'field', 'fjord', 'forest',
-    'galaxy', 'garden', 'glacier', 'harbor', 'hazel', 'island', 'jade', 'juniper',
-    'kernel', 'lagoon', 'lantern', 'lithium', 'maple', 'marble', 'matrix', 'meadow',
-    'meteor', 'nebula', 'night', 'nova', 'onyx', 'orbit', 'pepper', 'phoenix',
-    'pixel', 'planet', 'quartz', 'river', 'rocket', 'saffron', 'shadow', 'signal',
-    'silver', 'spruce', 'summit', 'thunder', 'tiger', 'velvet', 'violet', 'walnut'
-  ];
+  // Word pools for the memorable mode; each maps to one toggle in the UI.
+  const WORDS = {
+    nature: [
+      'breeze', 'brook', 'canyon', 'cedar', 'clover', 'field', 'fjord', 'forest',
+      'garden', 'glacier', 'harbor', 'island', 'lagoon', 'maple', 'meadow', 'river',
+      'spruce', 'summit', 'valley', 'walnut'
+    ],
+    space: [
+      'atlas', 'comet', 'cosmos', 'delta', 'galaxy', 'gravity', 'kernel', 'lunar',
+      'matrix', 'meteor', 'nebula', 'nova', 'orbit', 'phoenix', 'pixel', 'planet',
+      'pulsar', 'quasar', 'rocket', 'signal'
+    ],
+    animals: [
+      'badger', 'bison', 'cobra', 'falcon', 'gecko', 'hawk', 'heron', 'lynx',
+      'marlin', 'moose', 'otter', 'panther', 'raven', 'salmon', 'sparrow', 'tiger',
+      'walrus', 'wolf'
+    ],
+    colors: [
+      'amber', 'azure', 'brick', 'copper', 'crimson', 'ember', 'hazel', 'indigo',
+      'jade', 'marble', 'olive', 'onyx', 'saffron', 'scarlet', 'shadow', 'silver',
+      'teal', 'velvet', 'violet'
+    ]
+  };
 
   const NO_SET_MSG = 'Vyber aspoň jednu znakovou sadu.';
+  const NO_DICT_MSG = 'Vyber aspoň jeden slovník.';
 
   function randomInt(maxExclusive) {
     const limit = Math.floor(0x100000000 / maxExclusive) * maxExclusive;
@@ -45,9 +60,11 @@
     return shuffle(required.concat(rest)).join('');
   }
 
-  function generateMemorable(count) {
-    const words = Array.from({ length: count }, () => WORDS[randomInt(WORDS.length)]);
-    return words.join('-') + randomInt(100);
+  function generateMemorable(count, pools, withPin) {
+    const all = pools.flat();
+    const words = Array.from({ length: count }, () => all[randomInt(all.length)]);
+    const pin = withPin ? '-' + String(randomInt(10000)).padStart(4, '0') : '';
+    return words.join('-') + pin;
   }
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -65,6 +82,13 @@
       numbers: document.getElementById('numbers'),
       symbols: document.getElementById('symbols')
     };
+    const dictBoxes = {
+      nature: document.getElementById('dictNature'),
+      space: document.getElementById('dictSpace'),
+      animals: document.getElementById('dictAnimals'),
+      colors: document.getElementById('dictColors')
+    };
+    const pinToggle = document.getElementById('pinToggle');
 
     // Parse an integer input, defaulting and clamping into [min, max].
     const readCount = (input, min, max, fallback) => {
@@ -85,7 +109,14 @@
     // has no character set selected (caller reports the error).
     const generateOne = () => {
       if (mode() === 'memorable') {
-        return generateMemorable(readWordCount());
+        const pools = [
+          dictBoxes.nature.checked ? WORDS.nature : null,
+          dictBoxes.space.checked ? WORDS.space : null,
+          dictBoxes.animals.checked ? WORDS.animals : null,
+          dictBoxes.colors.checked ? WORDS.colors : null
+        ].filter(Boolean);
+        if (pools.length === 0) return null;
+        return generateMemorable(readWordCount(), pools, pinToggle.checked);
       }
       const sets = [
         boxes.lowercase.checked ? LOWER : '',
@@ -107,11 +138,15 @@
       result.style.fontSize = (1.6 - t * (1.6 - 0.72)).toFixed(3) + 'rem';
     };
 
+    // The "nothing selected" warning depends on the mode: random has no
+    // charset, memorable has no dictionary.
+    const noSelectionMsg = () => (mode() === 'memorable' ? NO_DICT_MSG : NO_SET_MSG);
+
     const run = () => {
       copyHint.textContent = '';
       const pw = generateOne();
       if (pw === null) {
-        copyHint.textContent = NO_SET_MSG;
+        copyHint.textContent = noSelectionMsg();
         return;
       }
       result.textContent = pw;
@@ -282,7 +317,7 @@
     const nextPasswordOrWarn = () => {
       tableHint.textContent = '';
       const pw = generateOne();
-      if (pw === null) tableHint.textContent = NO_SET_MSG;
+      if (pw === null) tableHint.textContent = noSelectionMsg();
       return pw;
     };
 
