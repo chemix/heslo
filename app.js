@@ -459,7 +459,7 @@
     copyBtn.addEventListener('click', copy);
 
     [...Object.values(boxes), ...Object.values(dictBoxes), pinToggle]
-      .forEach((el) => el.addEventListener('change', saveSettings));
+      .forEach((el) => el.addEventListener('change', () => { saveSettings(); run(); }));
     length.addEventListener('change', saveSettings);
     wordCount.addEventListener('change', saveSettings);
 
