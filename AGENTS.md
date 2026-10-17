@@ -2,8 +2,9 @@
 
 Static, client-side password generator. No backend, no build step, no storage — `index.html` loads `app.js` and the CSS directly. Generation runs entirely in the browser via `crypto.getRandomValues`; generated values are never logged or persisted. Project specifics (features, file map, smoke tests) live in `README.md`.
 
-- **Live:** https://password.lithium.klab.cz/
-- **Served from:** the static files in this directory, served directly. Editing a file and saving it is the deploy — there is no service to restart.
+- **Live:** https://chemix.github.io/heslo/ (GitHub Pages)
+- **Source:** https://github.com/chemix/heslo
+- **Deploy:** pushing to `main` runs `.github/workflows/pages.yml`, which publishes the repo root to GitHub Pages. No build step. Asset links in `index.html` must stay relative so the page works under the `/heslo/` subpath.
 
 ## Files
 
@@ -11,6 +12,7 @@ Static, client-side password generator. No backend, no build step, no storage �
 - `app.js` — client-side generator logic (random + memorable modes, bulk 10-password table). All logic lives in one `DOMContentLoaded` closure; nothing is exported.
 - `styles.css` — project styles over Kostra tokens.
 - `kostra.css` — drop-in Kostra CSS from `/var/www/kostra/.claude/skills/kostra-css/kostra.css`.
+- `.github/workflows/pages.yml` — GitHub Pages deploy on push to `main`.
 
 ## Local Claude tooling
 

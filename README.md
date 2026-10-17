@@ -1,6 +1,8 @@
 # Password Generator
 
-Statický klientský generátor pro https://password.lithium.klab.cz/.
+Statický klientský generátor hesel. Běží jako veřejná stránka na GitHub Pages: https://chemix.github.io/heslo/
+
+Zdrojáky: https://github.com/chemix/heslo
 
 ## Co umí
 
@@ -29,9 +31,13 @@ node --check /var/www/password/app.js
 
 Chování se ověřuje v prohlížeči — generátor běží celý v `DOMContentLoaded` closure a nic neexportuje, takže běh bez DOM není k dispozici.
 
+## Nasazení
+
+Push do `main` spustí workflow `.github/workflows/pages.yml`, které obsah repa nahraje jako artefakt a nasadí na GitHub Pages. Žádný build krok není — assety v `index.html` se odkazují relativně, takže stránka funguje i pod podcestou `/heslo/`.
+
 Veřejná kontrola:
 
 ```bash
-curl -I https://password.lithium.klab.cz/
-curl -fsSL https://password.lithium.klab.cz/ | grep -E 'Password Generator|app.js|kostra.css'
+curl -I https://chemix.github.io/heslo/
+curl -fsSL https://chemix.github.io/heslo/ | grep -E 'Password Generator|app.js|kostra.css'
 ```
